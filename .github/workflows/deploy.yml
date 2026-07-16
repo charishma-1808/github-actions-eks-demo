@@ -42,10 +42,10 @@ jobs:
           $ECR_REPOSITORY:${{ github.sha }} \
           ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
 
-            - name: Push Docker Image
+                  - name: Push Docker Image
         run: |
           docker push \
-          ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
+            ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
 
       - name: Clone GitOps Repository
         run: |
@@ -65,5 +65,4 @@ jobs:
 
           git add deployment.yaml
           git commit -m "Update image to ${{ github.sha }}" || echo "No changes"
-
           git push
