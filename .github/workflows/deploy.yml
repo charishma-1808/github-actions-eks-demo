@@ -36,7 +36,7 @@ jobs:
         run: |
           docker build -t $ECR_REPOSITORY:${{ github.sha }} .
 
-      -       - name: Tag Docker Image
+      - name: Tag Docker Image
         run: |
           docker tag \
             $ECR_REPOSITORY:${{ github.sha }} \
@@ -64,4 +64,4 @@ jobs:
 
           git add deployment.yaml
           git commit -m "Update image to ${{ github.sha }}" || echo "No changes"
-          git push origin main
+          git push
