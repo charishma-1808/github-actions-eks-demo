@@ -36,17 +36,16 @@ jobs:
         run: |
           docker build -t $ECR_REPOSITORY:${{ github.sha }} .
 
-      - name: Tag Docker Image
+      -       - name: Tag Docker Image
         run: |
           docker tag \
-          $ECR_REPOSITORY:${{ github.sha }} \
-          ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
+            $ECR_REPOSITORY:${{ github.sha }} \
+            ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
 
-                  - name: Push Docker Image
+      - name: Push Docker Image
         run: |
           docker push \
             ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
-
       - name: Clone GitOps Repository
         run: |
           git clone https://x-access-token:${{ secrets.GITOPS_TOKEN }}@github.com/charishma-1808/github-actions-eks-gitops.git
@@ -65,4 +64,4 @@ jobs:
 
           git add deployment.yaml
           git commit -m "Update image to ${{ github.sha }}" || echo "No changes"
-          git push
+          git push origin main
