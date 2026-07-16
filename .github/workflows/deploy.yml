@@ -47,21 +47,24 @@ jobs:
           docker push \
           ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
 
-      - name: Update kubeconfig
+            - name: Clone GitOps Repository
         run: |
-          aws eks update-kubeconfig \
-            --name $EKS_CLUSTER_NAME \
-            --region $AWS_REGION
+          git clone https://x-access-token:${{ secrets.GITOPS_TOKEN }}@github.com/charishma-1808/github-actions-eks-gitops.git
 
-      - name: Update deployment image
+      - name: Update Deployment Image
         run: |
-          sed -i "s|943086490311.dkr.ecr.ap-south-1.amazonaws.com/github-actions-demo:latest|${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}|g" deployment.yaml
+          cd github-actions-eks-gitops
+          sed -i "s|image:.*|image: ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}|g" deployment.yaml
 
-      - name: Deploy to Kubernetes
+      - name: Commit and Push Changes
         run: |
-          kubectl apply -f deployment.yaml
-          kubectl apply -f service.yaml
+          cd github-actions-eks-gitops
 
-      - name: Verify Deployment
-        run: |
-          kubectl rollout status deployment/github-actions-demo
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add deployment.yaml
+
+          git commit -m "Update image to ${{ github.sha }}" || echo "No changes"
+
+          git push
